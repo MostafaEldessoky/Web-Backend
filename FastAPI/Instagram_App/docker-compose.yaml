@@ -1,0 +1,33 @@
+version: "3.8"
+
+networks:
+  instagram_network:
+    ipam:
+      config:
+        - subnet: 172.19.0.0/24
+services:
+  instagram_app:
+    build: .
+    command: sh -c "uvicorn main:app --port=8000 --host=0.0.0.0"
+    ports:
+      - "8000:8000"
+    networks:
+      instagram_network:
+        ipv4_address: 172.19.0.2
+
+
+  caching:
+    image: redis
+    networks:
+      instagram_network:
+        ipv4_address: 172.19.0.4
+  
+  DB:
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: postgres
+    networks:
+      instagram_network:
+        ipv4_address: 172.19.0.3

@@ -1,0 +1,63 @@
+version: '3'
+
+networks:
+  app_network:
+    ipam:
+      config:
+        - subnet: 172.18.0.0/24
+
+services:
+  inventory:
+    build: /inventory/.
+    command: sh -c "uvicorn main:app --port=8000 --host=0.0.0.0"
+    ports:
+      - "8080:8000"
+    networks:
+      app_network:
+        ipv4_address: 172.18.0.5
+
+
+  inventory_events:
+    build: /inventory_events/.
+    networks:
+      app_network:
+        ipv4_address: 172.18.0.7
+
+  payment:
+    build: /payment/.
+    command: sh -c "uvicorn main:app --port=8000 --host=0.0.0.0"
+    ports:
+      - "6060:8000"
+    networks:
+      app_network:
+        ipv4_address: 172.18.0.6
+    
+
+  payment_events:
+    build: /payment_events/.
+    networks:
+      app_network:
+        ipv4_address: 172.18.0.8
+
+  streaming_channel:
+    image: redis
+    networks:
+      app_network:
+        ipv4_address: 172.18.0.2
+
+  inventory_db:
+    image: redis
+    networks:
+      app_network:
+        ipv4_address: 172.18.0.3
+
+  payment_db:
+    image: redis
+    networks:
+      app_network:
+        ipv4_address: 172.18.0.4
+
+
+
+
+
